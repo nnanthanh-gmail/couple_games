@@ -1,0 +1,7 @@
+services:
+  oanquan:
+    build: .
+    container_name: oanquan-couple
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
