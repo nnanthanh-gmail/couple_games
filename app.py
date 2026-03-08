@@ -621,6 +621,7 @@ var isAnim=false;
 var selectedPit=null, selectedPitEl=null;
 var selPit=null, selPitEl=null;
 var currentGame=null;
+var lastCaroMoveKey='';
 
 // ── WS ──
 function connectWS(){
@@ -875,6 +876,7 @@ function handleOAQ(state, steps, mover){
   currentGame='oanquan';
   show('oaqWrap');hide('lobbyWrap');hide('caroWrap');
   latestState=state; latestOAQ=state;
+  if(steps&&steps.length>0)refreshScoreLove();
   var isMyTurn=state.started&&state.turn===myRole&&!state.winner;
   if(steps&&steps.length>0){
     animateSteps(steps,state.board,mover).then(function(){applyOAQStateUI(state,isMyTurn);});
@@ -1013,6 +1015,12 @@ function handleCaro(d){
   currentGame=d.state.size===3?'caro3':'caro5';
   show('caroWrap');hide('lobbyWrap');hide('oaqWrap');
   if(!window.__caroLoveInit){refreshCaroLove();window.__caroLoveInit=true;}
+  var lm=d.state&&d.state.last_move;
+  var moveKey=lm?(lm[0]+'-'+lm[1]+'-'+(d.state.turn||'')+'-'+((d.state.scores&&d.state.scores.p1)||0)+'-'+((d.state.scores&&d.state.scores.p2)||0)):'';
+  if(moveKey&&moveKey!==lastCaroMoveKey){
+    refreshCaroLove();
+    lastCaroMoveKey=moveKey;
+  }
   latestCaro=d.state;renderCaroBoard(d.state);applyCaroUI(d.state)
 }
 function renderCaroBoard(state){
