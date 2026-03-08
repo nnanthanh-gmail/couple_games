@@ -507,6 +507,7 @@ HTML = r"""<!DOCTYPE html>
         </div>
         <div class="caro-info-row">
           <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto">
+            <button class="back-btn" onclick="requestBackLobby()">🏠 Đổi game</button>
             <div class="caro-size-tag" id="caroSizeTag">Caro ×3</div>
             <div class="caro-turn-chip"><span class="pulse-dot"></span><span id="caroTurnText">Đang chờ...</span></div>
           </div>
@@ -515,7 +516,6 @@ HTML = r"""<!DOCTYPE html>
         <div class="win-banner hidden" id="caroWinBanner"><h2 id="caroWinTxt">😍 Chiến thắng!</h2><p id="caroWinSub">💕</p></div>
         <div style="display:flex;gap:10px;flex-wrap:wrap">
           <button class="new-game-btn hidden" id="caroNewBtn" onclick="requestNewCaro()">🎮 Ván mới</button>
-          <button class="back-btn" onclick="requestBackLobby()">🏠 Đổi game</button>
         </div>
       </div>
     </div>
