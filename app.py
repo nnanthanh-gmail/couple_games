@@ -480,13 +480,33 @@ HTML = r"""<!DOCTYPE html>
     <!-- CARO -->
     <div class="board-wrap hidden" id="caroWrap">
       <div class="caro-wrap">
-        <div class="caro-info-row">
-          <div class="caro-scores">
-            <div class="caro-chip" id="cch1"><div class="caro-chip-name" id="ccn1">P1</div><div class="caro-chip-score" id="ccs1">0</div></div>
-            <div class="caro-vs">vs</div>
-            <div class="caro-chip" id="cch2"><div class="caro-chip-name" id="ccn2">P2</div><div class="caro-chip-score" id="ccs2">0</div></div>
+        <div class="board-topbar">
+          <div class="score-love-note" id="caroLoveNote">
+            <div class="score-love-note-header">
+              <span class="score-love-note-emoji" id="caroLoveEmoji">💕</span>
+              <button class="score-love-btn" id="caroLoveBtn" onclick="refreshCaroLove()">✨</button>
+            </div>
+            <span class="score-love-note-text" id="caroLoveText">Caro cùng người thương thì ván nào cũng vui 💞</span>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <div class="score-card-float">
+            <div class="score-players">
+              <div class="score-side" id="caroScoreCard1">
+                <div class="score-avatar p1" id="caroAvatar1">P1</div>
+                <div class="score-pname" id="ccn1">P1</div>
+                <div class="score-num-big" id="ccs1">0</div>
+              </div>
+              <div class="score-divider-vs"><span class="score-vs-text">vs</span></div>
+              <div class="score-side" id="caroScoreCard2">
+                <div class="score-avatar p2" id="caroAvatar2">P2</div>
+                <div class="score-pname" id="ccn2">P2</div>
+                <div class="score-num-big" id="ccs2">0</div>
+              </div>
+            </div>
+            <div class="score-bar-wrap"><div class="score-bar-inner" id="caroScoreBar" style="width:50%"></div></div>
+          </div>
+        </div>
+        <div class="caro-info-row">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto">
             <div class="caro-size-tag" id="caroSizeTag">Caro ×3</div>
             <div class="caro-turn-chip"><span class="pulse-dot"></span><span id="caroTurnText">Đang chờ...</span></div>
           </div>
@@ -992,6 +1012,7 @@ document.addEventListener('click',function(e){
 function handleCaro(d){
   currentGame=d.state.size===3?'caro3':'caro5';
   show('caroWrap');hide('lobbyWrap');hide('oaqWrap');
+  if(!window.__caroLoveInit){refreshCaroLove();window.__caroLoveInit=true;}
   latestCaro=d.state;renderCaroBoard(d.state);applyCaroUI(d.state)
 }
 function renderCaroBoard(state){
@@ -1020,10 +1041,16 @@ function applyCaroUI(state){
   var p2n=(state.players&&state.players.p2)||'P2';
   document.getElementById('ccn1').innerText=p1n;
   document.getElementById('ccn2').innerText=p2n;
-  document.getElementById('ccs1').innerText=(state.scores&&state.scores.p1)||0;
-  document.getElementById('ccs2').innerText=(state.scores&&state.scores.p2)||0;
-  document.getElementById('cch1').classList.toggle('active',state.turn==='p1'&&!state.winner&&state.started);
-  document.getElementById('cch2').classList.toggle('active',state.turn==='p2'&&!state.winner&&state.started);
+  var sc1=(state.scores&&state.scores.p1)||0;
+  var sc2=(state.scores&&state.scores.p2)||0;
+  document.getElementById('ccs1').innerText=sc1;
+  document.getElementById('ccs2').innerText=sc2;
+  document.getElementById('caroAvatar1').innerText=(p1n.charAt(0).toUpperCase()||'P');
+  document.getElementById('caroAvatar2').innerText=(p2n.charAt(0).toUpperCase()||'P');
+  document.getElementById('caroScoreCard1').classList.toggle('winning',sc1>sc2);
+  document.getElementById('caroScoreCard2').classList.toggle('winning',sc2>sc1);
+  var total=sc1+sc2;
+  document.getElementById('caroScoreBar').style.width=(total>0?Math.round(sc1/total*100):50)+'%';
   document.getElementById('caroSizeTag').innerText='Caro ×'+state.size;
   var isMyTurn=state.started&&state.turn===myRole&&!state.winner;
   var tp=(state.players&&state.players[state.turn])||state.turn||'—';
@@ -1103,6 +1130,18 @@ function refreshScoreLove(){
   document.getElementById('scoreLoveEmoji').innerText=n[0];
   document.getElementById('scoreLoveText').innerText=n[1];
   var btn=document.getElementById('scoreLoveBtn');
+  btn.innerText=BTN_EM[bi];
+  btn.classList.remove('spin');void btn.offsetWidth;btn.classList.add('spin');
+  setTimeout(()=>btn.classList.remove('spin'),370)
+}
+var lastCL=-1,lastCBI=-1;
+function refreshCaroLove(){
+  var i;do{i=Math.floor(Math.random()*LOVES.length)}while(i===lastCL);lastCL=i;
+  var bi;do{bi=Math.floor(Math.random()*BTN_EM.length)}while(bi===lastCBI);lastCBI=bi;
+  var n=LOVES[i];
+  document.getElementById('caroLoveEmoji').innerText=n[0];
+  document.getElementById('caroLoveText').innerText=n[1];
+  var btn=document.getElementById('caroLoveBtn');
   btn.innerText=BTN_EM[bi];
   btn.classList.remove('spin');void btn.offsetWidth;btn.classList.add('spin');
   setTimeout(()=>btn.classList.remove('spin'),370)
